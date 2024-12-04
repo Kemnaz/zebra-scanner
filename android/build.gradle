@@ -1,0 +1,19 @@
+apply plugin: 'com.android.library'
+
+group = 'expo.modules.zebrascanner'
+version = '4.1.0'
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+useDefaultAndroidSdkVersions()
+useExpoPublishing()
+
+android {
+  namespace "expo.modules.zebrascanner"
+  defaultConfig {
+    versionCode 1
+    versionName "4.1.0"
+  }
+}
