@@ -7,7 +7,6 @@ import {
 } from 'react-native-paper';
 import { tableFetch } from '../enpoints/endpointManager';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
-import TableModalComponent from './tablemodal';
 import { useRouter } from 'expo-router';
 import { styles } from './tablestyles';
 
@@ -18,7 +17,7 @@ interface TableComponentProps {
 interface Asset {
   assetId: string;
   description: string;
-  itemStatus: string;
+  inventoryStatus: string;
 }
 
 interface RoomData {
@@ -75,6 +74,20 @@ const TableComponent: React.FC<TableComponentProps> = ({ room }) => {
     ...DefaultTheme,
   };
 
+  // Funkcja określająca styl wiersza na podstawie inventoryStatus
+  const getRowStyle = (status: string) => {
+    switch (status) {
+      case 'MISSING':
+        return { backgroundColor: '#d61e2d' };
+      case 'OK':
+        return { backgroundColor: 'green' };
+      case 'NEW':
+        return { backgroundColor: 'yellow' };
+      default:
+        return { backgroundColor: 'white' };
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -87,7 +100,9 @@ const TableComponent: React.FC<TableComponentProps> = ({ room }) => {
         <PaperProvider theme={theme}>
           <DataTable style={styles.dataTable}>
             {items.slice(from, to).map(item => (
-              <DataTable.Row key={item.assetId}>
+              <DataTable.Row
+                key={item.assetId}
+                style={getRowStyle(item.inventoryStatus)}>
                 <DataTable.Cell style={styles.assetIdColumn}>
                   {item.assetId}
                 </DataTable.Cell>

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-zebra-scanner-example",
-    "slug": "expo-zebra-scanner-example",
+    "name": "AssetHouse",
+    "slug": "AssetHouse",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -30,6 +30,14 @@
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "781a4afa-e7c6-4871-81e3-3b306319c335"
+      }
+    }
   }
 }

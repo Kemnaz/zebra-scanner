@@ -1,10 +1,10 @@
 import { URLPATH } from '@/src/library/constants/URL';
 
-export const areasFetch = async () => {
+export const areasFetch = async (page = 0, search: any) => {
   let result = null;
   try {
     const response = await fetch(
-      `${URLPATH}/api/dashboard/listLocationsWithAssets?page=0&size=20&sort=location`,
+      `${URLPATH}/api/dashboard/listLocationsWithAssets?location=${search}&page=${page}&size=5&sort=location`,
       {
         method: 'GET',
         headers: {
@@ -22,7 +22,6 @@ export const areasFetch = async () => {
     console.error('areasFetch error:', err);
   }
 
-  // Return the result directly, assuming it contains the correct data structure
   return result;
 };
 

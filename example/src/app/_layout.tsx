@@ -30,7 +30,7 @@ export default function TabLayout() {
           name="rooms"
           options={{
             title: 'Rooms',
-            headerTitle: 'Expo zebra scanner',
+            headerTitle: 'AssetHouse',
             tabBarIcon: ({ color, focused }) => (
               <TabBarIcon
                 name={focused ? 'location' : 'location-outline'}
@@ -43,7 +43,7 @@ export default function TabLayout() {
           name="index"
           options={{
             title: 'Test',
-            headerTitle: 'Expo zebra scanner',
+            headerTitle: 'AssetHouse',
             tabBarIcon: ({ color, focused }) => (
               <TabBarIcon
                 name={focused ? 'barcode' : 'barcode-outline'}

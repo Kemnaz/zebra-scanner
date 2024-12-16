@@ -34,7 +34,7 @@ export default function RoomComponent() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [scannedAssets, setScannedAssets] = useState<Set<string>>(new Set());
   const [newAssets, setNewAssets] = useState<Set<string>>(new Set());
-
+  const user = 'user1';
   useEffect(() => {
     getAssets();
   }, [location]);
@@ -85,6 +85,7 @@ export default function RoomComponent() {
   async function onSaveClick() {
     const payload = {
       location,
+      user,
       assets: assets.map(({ assetId, inventoryStatus, comment }) => {
         // Prevent modification of NEW items
         const status = newAssets.has(assetId)
@@ -184,9 +185,9 @@ export default function RoomComponent() {
               <DataTable.Title style={roomtablestyles.column}>
                 Description
               </DataTable.Title>
-              <DataTable.Title style={roomtablestyles.column}>
+              {/* <DataTable.Title style={roomtablestyles.column}>
                 Status
-              </DataTable.Title>
+              </DataTable.Title> */}
               <DataTable.Title style={roomtablestyles.column}>
                 Actions
               </DataTable.Title>
@@ -202,9 +203,9 @@ export default function RoomComponent() {
                 <DataTable.Cell style={roomtablestyles.column} numeric>
                   {item.description}
                 </DataTable.Cell>
-                <DataTable.Cell style={roomtablestyles.column} numeric>
+                {/* <DataTable.Cell style={roomtablestyles.column} numeric>
                   {item.inventoryStatus}
-                </DataTable.Cell>
+                </DataTable.Cell> */}
                 <DataTable.Cell style={roomtablestyles.column}>
                   <Pressable
                     style={deleteBtn}
