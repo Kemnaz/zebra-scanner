@@ -13,7 +13,7 @@ export default function TabLayout() {
   useEffect(() => {
     ExpoZebraScanner.createIntentDatawedgeProfile({
       PROFILE_NAME,
-      PACKAGE_NAME: 'expo.modules.zebrascanner.example',
+      PACKAGE_NAME: 'expo.modules.zebrascanner.example.preview',
       PARAM_LIST: {
         decoder_i2of5: 'true',
       },

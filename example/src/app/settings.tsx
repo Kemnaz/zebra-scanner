@@ -6,32 +6,29 @@ import {
   Switch,
   TextInput,
   ScrollView,
+  Button,
 } from 'react-native';
 import { SettingsContext } from '../library/context/SettingsContext';
 
-/*
-  The settings shown here are for example purposes, currently there's no way
-  to get the actual configuration of a profile and this configurations arent persistent
-  because when you create a profile with createIntentDatawedgeProfile() all the settings
-  are reseted
-*/
-
-// PR idea 1: Refactorize this code in reusable components
-// PR idea 2: Modify the native code to get the profile current settings
-// PR idea 3: Make this settings persistent with async storage or something if #2 can't be done
-// PR idea 4: Modify createIntentDatawedgeProfile() to avoid reset settings
 export default function SettingsScreen() {
   const {
     isIntentEnabled,
     isKeystrokeEnterEnabled,
     intentPrefix,
     keystrokePrefix,
+    urlPath,
     updateSettings,
   } = useContext(SettingsContext);
 
   const [intentPrefixValue, setIntentPrefixValue] = useState(intentPrefix);
   const [keystrokePrefixValue, setKeystrokePrefixValue] =
     useState(keystrokePrefix);
+  const [newUrlPath, setNewUrlPath] = useState(urlPath); // State for new URL input
+
+  const handleUrlSubmit = () => {
+    // Update the urlPath in the settings context
+    updateSettings('urlPath', newUrlPath);
+  };
 
   return (
     <ScrollView>
@@ -83,7 +80,7 @@ export default function SettingsScreen() {
         />
       </View>
       <View style={[styles.configContainer, { paddingVertical: 10 }]}>
-        <Text style={styles.configLabel}>Data prefix</Text>
+        <Text style={styles.configLabel}>Keystroke Prefix</Text>
         <TextInput
           value={keystrokePrefixValue}
           onChangeText={setKeystrokePrefixValue}
@@ -101,6 +98,24 @@ export default function SettingsScreen() {
             updateSettings('keystrokePrefix', e.nativeEvent.text)
           }
         />
+      </View>
+
+      {/* Display and Update URL Path */}
+      <View style={[styles.configContainer, { paddingVertical: 20 }]}>
+        <Text style={styles.configLabel}>Current URL Path: {urlPath}</Text>
+      </View>
+      <View style={[styles.configContainer, { paddingVertical: 10 }]}>
+        <Text style={styles.configLabel}>New URL Path</Text>
+        <TextInput
+          value={newUrlPath}
+          onChangeText={setNewUrlPath}
+          style={styles.textinput}
+          placeholder="Enter new URL"
+        />
+      </View>
+
+      <View style={styles.configContainer}>
+        <Button title="Submit URL" onPress={handleUrlSubmit} />
       </View>
     </ScrollView>
   );
@@ -134,6 +149,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingVertical: 10,
     paddingHorizontal: 15,
-    width: 100,
+    width: 200,
   },
 });

@@ -1,10 +1,10 @@
 import { URLPATH } from '@/src/library/constants/URL';
 
-export const areasFetch = async (page = 0, search: any) => {
+export const areasFetch = async (urlPath: string, page = 0, search: any) => {
   let result = null;
   try {
     const response = await fetch(
-      `${URLPATH}/api/dashboard/listLocationsWithAssets?location=${search}&page=${page}&size=5&sort=location`,
+      `${urlPath}/api/dashboard/listLocationsWithAssets?location=${search}&page=${page}&size=5&sort=location`,
       {
         method: 'GET',
         headers: {
@@ -25,11 +25,11 @@ export const areasFetch = async (page = 0, search: any) => {
   return result;
 };
 
-export const tableFetch = async (room: string) => {
+export const tableFetch = async (urlPath: string, room: string) => {
   let result;
   try {
     const response = await fetch(
-      `${URLPATH}/api/locations/locationsToRoomsPage?location=${room}&page=0&size=1&sort=itemStatus`,
+      `${urlPath}/api/locations/locationsToRoomsPage?location=${room}&page=0&size=1&sort=itemStatus`,
       {
         method: 'GET',
       },
@@ -45,11 +45,14 @@ export const tableFetch = async (room: string) => {
   }
   return result;
 };
-export const insideLocationFetch = async (location: string) => {
+export const insideLocationFetch = async (
+  urlPath: string,
+  location: string,
+) => {
   let result;
   try {
     const response = await fetch(
-      `${URLPATH}/api/locations/insideLocation?location=${location}&page=0&size=20&sort=assetId`,
+      `${urlPath}/api/locations/insideLocation?location=${location}&page=0&size=20&sort=assetId`,
       {
         method: 'GET',
       },
@@ -62,34 +65,6 @@ export const insideLocationFetch = async (location: string) => {
     console.log(result);
   } catch (err) {
     console.error('insideLocationFetch error:', err);
-  }
-  return result;
-};
-
-export const updateArea = async (updatedAreaData: string) => {
-  let result = null;
-  try {
-    const response = await fetch('http://192.168.0.192:4000/api/updateArea', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ assets: updatedAreaData }),
-    });
-
-    if (!response.ok) {
-      const errorResponse = await response.text();
-      console.error(
-        'Network response was not ok:',
-        response.status,
-        errorResponse,
-      );
-      throw new Error('Network response was not ok');
-    }
-
-    result = await response.json();
-  } catch (err) {
-    console.error('Fetch error:', err);
   }
   return result;
 };

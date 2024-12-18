@@ -3,6 +3,8 @@ import { List, Button, TextInput } from 'react-native-paper';
 import TableComponent from '../components/rooms/table';
 import { ScrollView, StyleSheet, View, Text } from 'react-native';
 import { areasFetch } from '../components/enpoints/endpointManager';
+import { useContext } from 'react';
+import { SettingsContext } from '../library/context/SettingsContext';
 
 interface RoomData {
   location: string;
@@ -29,6 +31,7 @@ const MyComponent = () => {
   const [totalPages, setTotalPages] = React.useState<number>(1);
   const [searchQuery, setSearchQuery] = React.useState<string>('');
   const [isSearching, setIsSearching] = React.useState<boolean>(false);
+  const { urlPath } = useContext(SettingsContext);
 
   const handlePress = (location: string) => {
     setExpanded(expanded === location ? null : location);
@@ -36,7 +39,7 @@ const MyComponent = () => {
 
   async function getAreas(page: number, search: string = '') {
     try {
-      const data: RoomDataResponse = await areasFetch(page, search);
+      const data: RoomDataResponse = await areasFetch(urlPath, page, search);
       if (data != null) {
         setRooms(data.content);
         setTotalPages(data.pagination.totalPages);

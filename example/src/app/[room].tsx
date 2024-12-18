@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import {
   DataTable,
@@ -10,7 +10,7 @@ import { useRoute, RouteProp } from '@react-navigation/native';
 import * as ExpoZebraScanner from 'expo-zebra-scanner';
 import { insideLocationFetch } from '../components/enpoints/endpointManager';
 import { roomtablestyles } from './roomtablestyles';
-import { URLPATH } from '../library/constants/URL';
+import { SettingsContext } from '../library/context/SettingsContext'; // Import SettingsContext
 
 type RouteParams = { room: string };
 
@@ -35,9 +35,12 @@ export default function RoomComponent() {
   const [scannedAssets, setScannedAssets] = useState<Set<string>>(new Set());
   const [newAssets, setNewAssets] = useState<Set<string>>(new Set());
   const user = 'user1';
+
+  const { urlPath } = useContext(SettingsContext);
+
   useEffect(() => {
     getAssets();
-  }, [location]);
+  }, [location, urlPath]);
 
   useEffect(() => {
     const listener = ExpoZebraScanner.addListener(event => {
@@ -76,7 +79,7 @@ export default function RoomComponent() {
   }, [assets]);
 
   async function getAssets() {
-    const data: RoomData = await insideLocationFetch(location);
+    const data: RoomData = await insideLocationFetch(urlPath, location);
     if (data) {
       setAssets(data.content);
     }
@@ -105,7 +108,8 @@ export default function RoomComponent() {
     };
 
     try {
-      const response = await fetch(`${URLPATH}/api/mobile/updateOutcome`, {
+      const response = await fetch(`${urlPath}/api/mobile/updateOutcome`, {
+        // Use the urlPath from context
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -124,7 +128,7 @@ export default function RoomComponent() {
       // Refresh assets data after saving
       await getAssets();
     } catch (error) {
-      // console.error('Save failed:', error);
+      console.error('Save failed:', error);
       await getAssets();
     }
   }
@@ -185,9 +189,6 @@ export default function RoomComponent() {
               <DataTable.Title style={roomtablestyles.column}>
                 Description
               </DataTable.Title>
-              {/* <DataTable.Title style={roomtablestyles.column}>
-                Status
-              </DataTable.Title> */}
               <DataTable.Title style={roomtablestyles.column}>
                 Actions
               </DataTable.Title>
@@ -203,9 +204,6 @@ export default function RoomComponent() {
                 <DataTable.Cell style={roomtablestyles.column} numeric>
                   {item.description}
                 </DataTable.Cell>
-                {/* <DataTable.Cell style={roomtablestyles.column} numeric>
-                  {item.inventoryStatus}
-                </DataTable.Cell> */}
                 <DataTable.Cell style={roomtablestyles.column}>
                   <Pressable
                     style={deleteBtn}

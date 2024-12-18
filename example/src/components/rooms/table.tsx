@@ -9,6 +9,8 @@ import { tableFetch } from '../enpoints/endpointManager';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { styles } from './tablestyles';
+import { useContext } from 'react';
+import { SettingsContext } from '@/src/library/context/SettingsContext';
 
 interface TableComponentProps {
   room: string;
@@ -42,11 +44,11 @@ const TableComponent: React.FC<TableComponentProps> = ({ room }) => {
   );
   const [items, setItems] = React.useState<Asset[]>([]);
   const [loading, setLoading] = React.useState(true);
-
+  const { urlPath } = useContext(SettingsContext);
   async function updateAssets() {
     setLoading(true);
     try {
-      const data: RoomDataResponse = await tableFetch(room);
+      const data: RoomDataResponse = await tableFetch(urlPath, room);
       if (data != null) {
         const roomData = data.content.find(r => r.location === room);
         if (roomData) {

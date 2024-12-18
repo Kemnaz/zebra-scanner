@@ -5,14 +5,14 @@ const IS_PREVIEW = process.env.APP_VARIANT === 'preview';
 // Function to get the unique package/bundle identifier for each environment
 const getUniqueIdentifier = () => {
   if (IS_DEV) {
-    return 'com.assethouse.dev'; // Development app identifier
+    return 'expo.modules.zebrascanner.example'; // Development app identifier
   }
 
   if (IS_PREVIEW) {
-    return 'expo.modules.zebrascanner.example'; // Preview app identifier
+    return 'expo.modules.zebrascanner.example.preview'; // Preview app identifier
   }
 
-  return 'expo.modules.zebrascanner.example'; // Production app identifier
+  return 'expo.modules.zebrascanner.example.prod'; // Production app identifier
 };
 
 // Function to get the app name for each environment
