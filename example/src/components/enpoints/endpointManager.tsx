@@ -27,16 +27,15 @@ export const areasFetch = async (urlPath: string, page = 0, search: any) => {
 
 export const tableFetch = async (urlPath: string, room: string) => {
   let result;
+  console.log(room);
   try {
     const response = await fetch(
-      `${urlPath}/api/locations/locationsToRoomsPage?location=${room}&page=0&size=1&sort=itemStatus`,
+      `${urlPath}/api/locations/locationsToRoomsPage?searchLocation=${room}&page=0&size=1`,
       {
         method: 'GET',
       },
     );
-    if (!response.ok) {
-      throw new Error('tableFetch fetch response was not ok');
-    }
+
     result = await response.json();
     console.log('result');
     console.log(result);
