@@ -15,6 +15,15 @@ export const roomtablestyles = StyleSheet.create({
   button: {
     width: '80%',
   },
+  assetcolumn: {
+    borderRightColor: '#ededed',
+    borderRightWidth: 0.5,
+
+    flex: 3,
+  },
+  desccolumn: {
+    flex: 7,
+  },
   column: {
     flex: 1,
     justifyContent: 'center',

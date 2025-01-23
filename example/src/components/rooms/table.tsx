@@ -6,7 +6,13 @@ import {
   Button,
 } from 'react-native-paper';
 import { tableFetch } from '../enpoints/endpointManager';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { styles } from './tablestyles';
 import { useContext } from 'react';
@@ -79,14 +85,14 @@ const TableComponent: React.FC<TableComponentProps> = ({ room }) => {
   // Funkcja określająca styl wiersza na podstawie inventoryStatus
   const getRowStyle = (status: string) => {
     switch (status) {
-      case 'MISSING':
-        return { backgroundColor: '#d61e2d' };
       case 'OK':
-        return { backgroundColor: 'green' };
+        return { backgroundColor: '#8be6a0' };
       case 'NEW':
-        return { backgroundColor: 'yellow' };
+        return { backgroundColor: '#f7e08d' };
+      case 'MISSING':
+        return { backgroundColor: '#ff5252' };
       default:
-        return { backgroundColor: 'white' };
+        return { backgroundColor: '#B3D9FF' };
     }
   };
 
@@ -106,10 +112,10 @@ const TableComponent: React.FC<TableComponentProps> = ({ room }) => {
                 key={item.assetId}
                 style={getRowStyle(item.inventoryStatus)}>
                 <DataTable.Cell style={styles.assetIdColumn}>
-                  {item.assetId}
+                  <Text style={styles.assetText}> {item.assetId}</Text>
                 </DataTable.Cell>
                 <DataTable.Cell style={styles.descriptionColumn}>
-                  {item.description}
+                  <Text ellipsizeMode="tail"> {item.description}</Text>
                 </DataTable.Cell>
               </DataTable.Row>
             ))}

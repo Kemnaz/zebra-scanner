@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, ScrollView, Text, Pressable } from 'react-native';
 import {
   DataTable,
@@ -10,7 +10,7 @@ import { useRoute, RouteProp } from '@react-navigation/native';
 import * as ExpoZebraScanner from 'expo-zebra-scanner';
 import { insideLocationFetch } from '../components/enpoints/endpointManager';
 import { roomtablestyles } from './roomtablestyles';
-import { SettingsContext } from '../library/context/SettingsContext'; // Import SettingsContext
+import { SettingsContext } from '../library/context/SettingsContext';
 
 type RouteParams = { room: string };
 
@@ -33,7 +33,6 @@ export default function RoomComponent() {
   const location = decodeURIComponent(route.params.room);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [scannedAssets, setScannedAssets] = useState<Set<string>>(new Set());
-  const [newAssets, setNewAssets] = useState<Set<string>>(new Set());
   const user = 'user1';
 
   const { urlPath } = useContext(SettingsContext);
@@ -46,28 +45,38 @@ export default function RoomComponent() {
     const listener = ExpoZebraScanner.addListener(event => {
       const { scanData } = event;
 
-      // If asset isn't already in the current assets list, treat it as NEW
-      if (!assets.find(asset => asset.assetId === scanData)) {
-        setNewAssets(prev => new Set(prev.add(scanData)));
-        setAssets(prevAssets => [
-          ...prevAssets,
-          {
-            assetId: scanData,
-            description: 'New Asset', // You can add custom description logic here
-            inventoryStatus: 'NEW',
-            comment: '',
-          },
-        ]);
-      } else {
-        setScannedAssets(prev => new Set(prev.add(scanData)));
-        setAssets(prevAssets =>
-          prevAssets.map(asset =>
+      setAssets(prevAssets => {
+        const existingAsset = prevAssets.find(
+          asset => asset.assetId === scanData,
+        );
+
+        if (!existingAsset) {
+          // Add new asset with "NEW" status
+          return [
+            ...prevAssets,
+            {
+              assetId: scanData,
+              description: '',
+              inventoryStatus: 'NEW',
+              comment: '',
+            },
+          ];
+        } else if (
+          existingAsset.inventoryStatus !== 'NEW' &&
+          existingAsset.inventoryStatus !== 'OK'
+        ) {
+          // Update status to "OK" only if it's not "NEW" or "OK"
+          return prevAssets.map(asset =>
             asset.assetId === scanData
               ? { ...asset, inventoryStatus: 'OK' }
               : asset,
-          ),
-        );
-      }
+          );
+        }
+
+        return prevAssets;
+      });
+
+      setScannedAssets(prev => new Set(prev.add(scanData)));
     });
 
     ExpoZebraScanner.startScan();
@@ -90,14 +99,15 @@ export default function RoomComponent() {
       location,
       user,
       assets: assets.map(({ assetId, inventoryStatus, comment }) => {
-        // Prevent modification of NEW items
-        const status = newAssets.has(assetId)
-          ? 'NEW'
-          : scannedAssets.has(assetId)
-            ? 'OK'
-            : inventoryStatus === 'OK'
-              ? 'OK'
-              : 'MISSING'; // Default to MISSING if it was not scanned
+        let status = inventoryStatus;
+
+        if (
+          !scannedAssets.has(assetId) &&
+          !['NEW', 'OK'].includes(inventoryStatus)
+        ) {
+          // Assign "MISSING" status only if it has no status and was not scanned
+          status = 'MISSING';
+        }
 
         return {
           assetId,
@@ -109,7 +119,6 @@ export default function RoomComponent() {
 
     try {
       const response = await fetch(`${urlPath}/api/mobile/updateOutcome`, {
-        // Use the urlPath from context
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -138,11 +147,11 @@ export default function RoomComponent() {
       case 'OK':
         return { backgroundColor: '#8be6a0' };
       case 'NEW':
-        return { backgroundColor: '#f7e08d' }; // A yellowish color for NEW items
+        return { backgroundColor: '#f7e08d' };
       case 'MISSING':
-        return { backgroundColor: '#ec7d87' };
+        return { backgroundColor: '#ff5252' };
       default:
-        return {};
+        return { backgroundColor: '#B3D9FF' };
     }
   }
 
@@ -158,20 +167,24 @@ export default function RoomComponent() {
     alignItems: 'center',
   };
 
-  function markAsMissing(assetId: string) {
-    setAssets(prevAssets =>
-      prevAssets.map(asset =>
-        asset.assetId === assetId
-          ? { ...asset, inventoryStatus: 'MISSING' }
-          : asset,
-      ),
-    );
-    setScannedAssets(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(assetId);
-      return newSet;
-    });
-  }
+  // function markAsMissing(assetId: string) {
+  //   setAssets(prevAssets =>
+  //     prevAssets.map(asset => {
+  //       if (
+  //         asset.assetId === assetId &&
+  //         !['NEW', 'OK'].includes(asset.inventoryStatus)
+  //       ) {
+  //         return { ...asset, inventoryStatus: 'MISSING' };
+  //       }
+  //       return asset;
+  //     }),
+  //   );
+  //   setScannedAssets(prev => {
+  //     const newSet = new Set(prev);
+  //     newSet.delete(assetId);
+  //     return newSet;
+  //   });
+  // }
 
   return (
     <View style={{ flex: 1 }}>
@@ -183,34 +196,34 @@ export default function RoomComponent() {
 
           <DataTable>
             <DataTable.Header>
-              <DataTable.Title style={roomtablestyles.column}>
+              <DataTable.Title style={roomtablestyles.assetcolumn}>
                 Asset ID
               </DataTable.Title>
-              <DataTable.Title style={roomtablestyles.column}>
+              <DataTable.Title style={roomtablestyles.desccolumn}>
                 Description
               </DataTable.Title>
-              <DataTable.Title style={roomtablestyles.column}>
+              {/* <DataTable.Title style={roomtablestyles.column}>
                 Actions
-              </DataTable.Title>
+              </DataTable.Title> */}
             </DataTable.Header>
 
             {assets.map(item => (
               <DataTable.Row
                 key={item.assetId}
                 style={getRowColor(item.inventoryStatus)}>
-                <DataTable.Cell style={roomtablestyles.column}>
-                  {item.assetId}
+                <DataTable.Cell style={roomtablestyles.assetcolumn}>
+                  <Text> {item.assetId}</Text>
                 </DataTable.Cell>
-                <DataTable.Cell style={roomtablestyles.column} numeric>
-                  {item.description}
+                <DataTable.Cell style={roomtablestyles.desccolumn}>
+                  <Text ellipsizeMode="tail"> {item.description}</Text>
                 </DataTable.Cell>
-                <DataTable.Cell style={roomtablestyles.column}>
+                {/* <DataTable.Cell style={roomtablestyles.column}>
                   <Pressable
                     style={deleteBtn}
                     onPress={() => markAsMissing(item.assetId)}>
                     <Text style={{ color: '#FEFEFE' }}>MISS</Text>
                   </Pressable>
-                </DataTable.Cell>
+                </DataTable.Cell> */}
               </DataTable.Row>
             ))}
           </DataTable>

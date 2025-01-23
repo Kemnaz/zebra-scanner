@@ -1,4 +1,5 @@
 // initialSettings.ts
+import { URLPATH } from './URL';
 export type SettingsType = {
   isIntentEnabled: boolean;
   intentPrefix: string;
@@ -12,5 +13,5 @@ export const INITIAL_SETTINGS: SettingsType = {
   intentPrefix: '',
   isKeystrokeEnterEnabled: false,
   keystrokePrefix: '',
-  urlPath: 'http://192.168.0.18:8080/rfidentity',
+  urlPath: URLPATH,
 };

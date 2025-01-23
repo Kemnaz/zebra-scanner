@@ -1,4 +1,4 @@
-export const URLPATH = 'http://192.168.0.18:8080/rfidentity';
+export const URLPATH = 'http://192.168.88.18:8080/rfidentity';
 // URL IP MTU http://192.168.88.51:8080/rfidentity
 // URL localhost http://localhost:8080/rfidentity
 // URL IP Architektów http://192.168.0.18:8080/rfidentity
