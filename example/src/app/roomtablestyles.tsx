@@ -18,11 +18,11 @@ export const roomtablestyles = StyleSheet.create({
   assetcolumn: {
     borderRightColor: '#ededed',
     borderRightWidth: 0.5,
-
     flex: 3,
   },
   desccolumn: {
     flex: 7,
+    margin: 5,
   },
   column: {
     flex: 1,
@@ -40,5 +40,15 @@ export const roomtablestyles = StyleSheet.create({
     paddingHorizontal: 5,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  title: {
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
   },
 });

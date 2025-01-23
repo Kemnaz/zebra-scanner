@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, ScrollView, Text, Pressable } from 'react-native';
+import {
+  View,
+  ScrollView,
+  Text,
+  Pressable,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
 import {
   DataTable,
   Button,
@@ -29,6 +36,7 @@ interface RoomData {
 }
 
 export default function RoomComponent() {
+  const [isLoading, setIsLoading] = useState(true);
   const route = useRoute<RouteProp<{ params: RouteParams }, 'params'>>();
   const location = decodeURIComponent(route.params.room);
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -88,10 +96,12 @@ export default function RoomComponent() {
   }, [assets]);
 
   async function getAssets() {
+    setIsLoading(true);
     const data: RoomData = await insideLocationFetch(urlPath, location);
     if (data) {
       setAssets(data.content);
     }
+    setIsLoading(false);
   }
 
   async function onSaveClick() {
@@ -167,6 +177,14 @@ export default function RoomComponent() {
     alignItems: 'center',
   };
 
+  if (isLoading) {
+    return (
+      <SafeAreaView>
+        <ActivityIndicator></ActivityIndicator>
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
   // function markAsMissing(assetId: string) {
   //   setAssets(prevAssets =>
   //     prevAssets.map(asset => {
@@ -191,7 +209,7 @@ export default function RoomComponent() {
       <PaperProvider theme={theme}>
         <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
           <View style={roomtablestyles.label}>
-            <Text>Selected room: {location}</Text>
+            <Text style={roomtablestyles.title}>Selected room: {location}</Text>
           </View>
 
           <DataTable>
@@ -206,26 +224,34 @@ export default function RoomComponent() {
                 Actions
               </DataTable.Title> */}
             </DataTable.Header>
-
-            {assets.map(item => (
-              <DataTable.Row
-                key={item.assetId}
-                style={getRowColor(item.inventoryStatus)}>
-                <DataTable.Cell style={roomtablestyles.assetcolumn}>
-                  <Text> {item.assetId}</Text>
-                </DataTable.Cell>
-                <DataTable.Cell style={roomtablestyles.desccolumn}>
-                  <Text ellipsizeMode="tail"> {item.description}</Text>
-                </DataTable.Cell>
-                {/* <DataTable.Cell style={roomtablestyles.column}>
+            {isLoading ? (
+              <SafeAreaView style={roomtablestyles.loadingContainer}>
+                <ActivityIndicator></ActivityIndicator>
+                <Text style={roomtablestyles.title}>Loading...</Text>
+              </SafeAreaView>
+            ) : (
+              assets.map(item => (
+                <DataTable.Row
+                  key={item.assetId}
+                  style={getRowColor(item.inventoryStatus)}>
+                  <DataTable.Cell style={roomtablestyles.assetcolumn}>
+                    <Text> {item.assetId}</Text>
+                  </DataTable.Cell>
+                  <DataTable.Cell style={roomtablestyles.desccolumn}>
+                    <Text numberOfLines={2} ellipsizeMode="tail">
+                      {item.description}
+                    </Text>
+                  </DataTable.Cell>
+                  {/* <DataTable.Cell style={roomtablestyles.column}>
                   <Pressable
                     style={deleteBtn}
                     onPress={() => markAsMissing(item.assetId)}>
                     <Text style={{ color: '#FEFEFE' }}>MISS</Text>
                   </Pressable>
                 </DataTable.Cell> */}
-              </DataTable.Row>
-            ))}
+                </DataTable.Row>
+              ))
+            )}
           </DataTable>
         </ScrollView>
 

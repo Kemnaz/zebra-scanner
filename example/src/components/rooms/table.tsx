@@ -115,7 +115,9 @@ const TableComponent: React.FC<TableComponentProps> = ({ room }) => {
                   <Text style={styles.assetText}> {item.assetId}</Text>
                 </DataTable.Cell>
                 <DataTable.Cell style={styles.descriptionColumn}>
-                  <Text ellipsizeMode="tail"> {item.description}</Text>
+                  <Text numberOfLines={2} ellipsizeMode="tail">
+                    {item.description}
+                  </Text>
                 </DataTable.Cell>
               </DataTable.Row>
             ))}
@@ -126,7 +128,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ room }) => {
               mode="contained"
               onPress={() =>
                 router.push({
-                  pathname: '[room]',
+                  pathname: 'Room',
                   params: { room: room },
                 })
               }>

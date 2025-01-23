@@ -44,6 +44,7 @@ export const tableFetch = async (urlPath: string, room: string) => {
   }
   return result;
 };
+
 export const insideLocationFetch = async (
   urlPath: string,
   location: string,
@@ -51,7 +52,7 @@ export const insideLocationFetch = async (
   let result;
   try {
     const response = await fetch(
-      `${urlPath}/api/locations/insideLocation?location=${location}&page=0&size=20&sort=assetId`,
+      `${urlPath}/api/locations/insideLocation?location=${location}&page=0&size=1000&sort=inventoryStatus`,
       {
         method: 'GET',
       },

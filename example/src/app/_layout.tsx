@@ -66,8 +66,11 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="[room]"
-          options={{ tabBarItemStyle: { display: 'none' } }}
+          name="Room"
+          options={{
+            tabBarItemStyle: { display: 'none' },
+            headerTitle: 'AssetHouse',
+          }}
         />
       </Tabs>
     </SettingsContext.Provider>
