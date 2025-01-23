@@ -8,21 +8,33 @@ export const roomtablestyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f8f8',
+    backgroundColor: 'rgba(214, 214, 214, 0.78)',
     paddingVertical: 10,
-    paddingHorizontal: 20,
   },
   button: {
     width: '80%',
+  },
+  tableheader: {
+    fontWeight: 'bold',
+    fontSize: 13,
   },
   assetcolumn: {
     borderRightColor: '#ededed',
     borderRightWidth: 0.5,
     flex: 3,
   },
+  assetheader: {
+    borderRightColor: '#ededed',
+    borderRightWidth: 0.5,
+    flex: 3,
+  },
+  descheader: {
+    flex: 7,
+  },
+
   desccolumn: {
     flex: 7,
-    margin: 5,
+    marginLeft: 5,
   },
   column: {
     flex: 1,

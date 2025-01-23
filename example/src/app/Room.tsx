@@ -3,7 +3,6 @@ import {
   View,
   ScrollView,
   Text,
-  Pressable,
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
@@ -18,6 +17,7 @@ import * as ExpoZebraScanner from 'expo-zebra-scanner';
 import { insideLocationFetch } from '../components/enpoints/endpointManager';
 import { roomtablestyles } from './roomtablestyles';
 import { SettingsContext } from '../library/context/SettingsContext';
+import { AntDesign } from '@expo/vector-icons'; // Make sure to install @expo/vector-icons
 
 type RouteParams = { room: string };
 
@@ -37,6 +37,8 @@ interface RoomData {
 
 export default function RoomComponent() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const route = useRoute<RouteProp<{ params: RouteParams }, 'params'>>();
   const location = decodeURIComponent(route.params.room);
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -46,6 +48,8 @@ export default function RoomComponent() {
   const { urlPath } = useContext(SettingsContext);
 
   useEffect(() => {
+    setIsSaving(false);
+    setSaveSuccess(false);
     getAssets();
   }, [location, urlPath]);
 
@@ -59,7 +63,6 @@ export default function RoomComponent() {
         );
 
         if (!existingAsset) {
-          // Add new asset with "NEW" status
           return [
             ...prevAssets,
             {
@@ -73,7 +76,6 @@ export default function RoomComponent() {
           existingAsset.inventoryStatus !== 'NEW' &&
           existingAsset.inventoryStatus !== 'OK'
         ) {
-          // Update status to "OK" only if it's not "NEW" or "OK"
           return prevAssets.map(asset =>
             asset.assetId === scanData
               ? { ...asset, inventoryStatus: 'OK' }
@@ -105,6 +107,7 @@ export default function RoomComponent() {
   }
 
   async function onSaveClick() {
+    setIsSaving(true);
     const payload = {
       location,
       user,
@@ -115,7 +118,6 @@ export default function RoomComponent() {
           !scannedAssets.has(assetId) &&
           !['NEW', 'OK'].includes(inventoryStatus)
         ) {
-          // Assign "MISSING" status only if it has no status and was not scanned
           status = 'MISSING';
         }
 
@@ -137,18 +139,26 @@ export default function RoomComponent() {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      // if (!response.ok) {
+      //   throw new Error(`HTTP error! status: ${response.status}`);
+      // }
 
       const result = await response.json();
       console.log('Save successful:', result);
 
       // Refresh assets data after saving
-      await getAssets();
-    } catch (error) {
-      console.error('Save failed:', error);
-      await getAssets();
+      // } catch (error) {
+      //   console.error('Save failed:', error);
+      //   setIsSaving(false);
+      //   await getAssets();
+      // }
+    } finally {
+      setIsSaving(false);
+      setSaveSuccess(true);
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 3000);
+      getAssets();
     }
   }
 
@@ -169,14 +179,6 @@ export default function RoomComponent() {
     ...DefaultTheme,
   };
 
-  const deleteBtn = {
-    backgroundColor: '#982B1C',
-    paddingVertical: 20,
-    paddingHorizontal: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-  };
-
   if (isLoading) {
     return (
       <SafeAreaView>
@@ -185,24 +187,6 @@ export default function RoomComponent() {
       </SafeAreaView>
     );
   }
-  // function markAsMissing(assetId: string) {
-  //   setAssets(prevAssets =>
-  //     prevAssets.map(asset => {
-  //       if (
-  //         asset.assetId === assetId &&
-  //         !['NEW', 'OK'].includes(asset.inventoryStatus)
-  //       ) {
-  //         return { ...asset, inventoryStatus: 'MISSING' };
-  //       }
-  //       return asset;
-  //     }),
-  //   );
-  //   setScannedAssets(prev => {
-  //     const newSet = new Set(prev);
-  //     newSet.delete(assetId);
-  //     return newSet;
-  //   });
-  // }
 
   return (
     <View style={{ flex: 1 }}>
@@ -214,15 +198,12 @@ export default function RoomComponent() {
 
           <DataTable>
             <DataTable.Header>
-              <DataTable.Title style={roomtablestyles.assetcolumn}>
-                Asset ID
+              <DataTable.Title style={roomtablestyles.assetheader}>
+                <Text style={roomtablestyles.tableheader}> Asset ID</Text>
               </DataTable.Title>
-              <DataTable.Title style={roomtablestyles.desccolumn}>
-                Description
+              <DataTable.Title style={roomtablestyles.descheader}>
+                <Text style={roomtablestyles.tableheader}> Description</Text>
               </DataTable.Title>
-              {/* <DataTable.Title style={roomtablestyles.column}>
-                Actions
-              </DataTable.Title> */}
             </DataTable.Header>
             {isLoading ? (
               <SafeAreaView style={roomtablestyles.loadingContainer}>
@@ -242,13 +223,6 @@ export default function RoomComponent() {
                       {item.description}
                     </Text>
                   </DataTable.Cell>
-                  {/* <DataTable.Cell style={roomtablestyles.column}>
-                  <Pressable
-                    style={deleteBtn}
-                    onPress={() => markAsMissing(item.assetId)}>
-                    <Text style={{ color: '#FEFEFE' }}>MISS</Text>
-                  </Pressable>
-                </DataTable.Cell> */}
                 </DataTable.Row>
               ))
             )}
@@ -257,10 +231,20 @@ export default function RoomComponent() {
 
         <View style={roomtablestyles.footer}>
           <Button
-            style={roomtablestyles.button}
+            style={[
+              roomtablestyles.button,
+              saveSuccess && { backgroundColor: '#4CAF50' },
+            ]}
             mode="contained"
-            onPress={onSaveClick}>
-            SAVE
+            onPress={onSaveClick}
+            disabled={isSaving || saveSuccess}>
+            {isSaving ? (
+              <ActivityIndicator color="white" />
+            ) : saveSuccess ? (
+              <AntDesign name="checkcircle" size={20} color="white" />
+            ) : (
+              'SAVE'
+            )}
           </Button>
         </View>
       </PaperProvider>
